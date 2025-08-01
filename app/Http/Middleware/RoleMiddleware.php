@@ -3,24 +3,23 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class RoleMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  string[]  ...$roles
-     * @return mixed
-     */
-    public function handle(Request $request, Closure $next, ...$roles)
+    public function handle($request, Closure $next, ...$roles)
     {
-        if (! $request->user() || ! in_array($request->user()->role, $roles)) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
+        try {
+            $user = JWTAuth::parseToken()->authenticate(); // ✅ Get logged-in user via JWT
 
-        return $next($request);
+            if (!in_array($user->role, $roles)) {
+                return response()->json(['error' => 'Forbidden – role mismatch'], 403);
+            }
+
+            return $next($request);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Unauthorized – token missing or invalid'], 401);
+        }
     }
 }

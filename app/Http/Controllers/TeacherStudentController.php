@@ -10,9 +10,7 @@ use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
 {
-    /**
-     * ✅ List all students (Admin sees all, teacher sees only own students)
-     */
+   
     public function index()
     {
         $authUser = auth()->user();
@@ -25,9 +23,6 @@ class StudentController extends Controller
         return response()->json(Student::all());
     }
 
-    /**
-     * ✅ Create student (Admin or Teacher)
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -46,7 +41,6 @@ class StudentController extends Controller
 
         $authUser = auth()->user();
 
-        // ✅ Create login user
         $user = User::create([
             'name'     => $request->first_name . ' ' . $request->last_name,
             'email'    => $request->email,
@@ -54,15 +48,12 @@ class StudentController extends Controller
             'role'     => 'student',
         ]);
 
-        // ✅ Determine teacher_id
         $teacherId = $request->assigned_teacher;
 
         if ($authUser->role === 'teacher') {
-            // teacher automatically assigns themselves
             $teacherId = Teacher::where('user_id', $authUser->id)->value('id');
         }
 
-        // ✅ Create student profile
         $student = Student::create([
             'user_id'       => $user->id,
             'teacher_id'    => $teacherId,
@@ -80,9 +71,7 @@ class StudentController extends Controller
         return response()->json(['message' => 'Student created successfully', 'student' => $student], 201);
     }
 
-    /**
-     * ✅ Show single student (Admin can see all, teacher only their students)
-     */
+  
     public function show($id)
     {
         $student = Student::findOrFail($id);
@@ -100,9 +89,7 @@ class StudentController extends Controller
         return response()->json($student);
     }
 
-    /**
-     * ✅ Update student (Admin can update all, teacher can update only their students)
-     */
+    
     public function update(Request $request, $id)
     {
         $student = Student::findOrFail($id);
@@ -130,14 +117,12 @@ class StudentController extends Controller
             'status'          => 'sometimes|required|in:Active,Inactive',
         ]);
 
-        // ✅ Update user table
         if ($request->has('email')) $user->email = $request->email;
         if ($request->has('first_name') || $request->has('last_name')) {
             $user->name = ($request->first_name ?? $student->first_name) . ' ' . ($request->last_name ?? $student->last_name);
         }
         $user->save();
 
-        // ✅ Update student table
         $student->update($request->only([
             'first_name', 'last_name', 'email', 'phone_number', 'roll_number',
             'class', 'date_of_birth', 'admission_date', 'status'
@@ -146,9 +131,7 @@ class StudentController extends Controller
         return response()->json(['message' => 'Student updated successfully', 'student' => $student]);
     }
 
-    /**
-     * ✅ Delete student (Admin can delete all, teacher can delete only their students)
-     */
+    
     public function destroy($id)
     {
         $student = Student::findOrFail($id);

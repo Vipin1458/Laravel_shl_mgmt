@@ -5,7 +5,7 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/register', [AuthController::class, 'register']); // Only for first admin setup
+Route::post('/register', [AuthController::class, 'register']); 
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware(['auth.jwt'])->group(function () {
@@ -13,14 +13,12 @@ Route::middleware(['auth.jwt'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
-// ✅ Admin CRUD
 Route::group(['middleware' => ['auth.jwt', 'role:admin']], function () {
     Route::apiResource('teachers', TeacherController::class);
-    Route::apiResource('students', StudentController::class); // Admin manages ALL students
+    Route::apiResource('students', StudentController::class); 
 });
 
-// ✅ Teacher CRUD (only their own students)
 Route::group(['middleware' => ['auth.jwt', 'role:teacher']], function () {
-    // Teacher uses the SAME StudentController but will be restricted automatically
-    Route::apiResource('students', StudentController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
+    Route::apiResource('teacher-students', StudentController::class)
+         ->only(['index', 'store', 'show', 'update', 'destroy']);
 });
