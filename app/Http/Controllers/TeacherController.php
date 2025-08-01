@@ -118,4 +118,51 @@ class TeacherController extends Controller
 
         return response()->json(['message' => 'Teacher deleted successfully']);
     }
+
+public function myProfile()
+{
+    $authUser = auth()->user();
+
+    if ($authUser->role !== 'teacher') {
+        return response()->json(['error' => 'Only teachers can access this'], 403);
+    }
+
+    $teacher = Teacher::with('user')->where('user_id', $authUser->id)->firstOrFail();
+
+    return response()->json($teacher);
+}
+
+
+public function updateProfile(Request $request)
+{
+    $authUser = auth()->user();
+
+    if ($authUser->role !== 'teacher') {
+        return response()->json(['error' => 'Only teachers can update their profile'], 403);
+    }
+
+    $teacher = Teacher::where('user_id', $authUser->id)->firstOrFail();
+    $user = $authUser;
+
+    $request->validate([
+        'first_name'   => 'sometimes|required|string',
+        'last_name'    => 'sometimes|required|string',
+        'email'        => 'sometimes|required|email|unique:users,email,' . $user->id,
+        'phone_number' => 'sometimes|required|string',
+        'status'       => 'sometimes|required|in:Active,Inactive',
+    ]);
+
+    if ($request->has('email')) $user->email = $request->email;
+    if ($request->has('first_name') || $request->has('last_name')) {
+        $user->name = ($request->first_name ?? $teacher->first_name) . ' ' .
+                      ($request->last_name ?? $teacher->last_name);
+    }
+    $user->save();
+
+    $teacher->update($request->only(['first_name', 'last_name', 'phone_number', 'email', 'status']));
+
+    return response()->json(['message' => '✅ Teacher profile updated successfully', 'teacher' => $teacher]);
+}
+
+
 }
