@@ -161,7 +161,25 @@ public function updateProfile(Request $request)
 
     $teacher->update($request->only(['first_name', 'last_name', 'phone_number', 'email', 'status']));
 
-    return response()->json(['message' => '✅ Teacher profile updated successfully', 'teacher' => $teacher]);
+    return response()->json(['message' => ' Teacher profile updated successfully', 'teacher' => $teacher]);
+}
+
+public function myStudents()
+{
+    $authUser = auth()->user();
+
+    if ($authUser->role !== 'teacher') {
+        return response()->json(['error' => 'Only teachers can access this'], 403);
+    }
+
+    $teacher = Teacher::where('user_id', $authUser->id)->firstOrFail();
+
+    $students = Student::where('teacher_id', $teacher->id)->get();
+
+    return response()->json([
+        'teacher' => $teacher->first_name . ' ' . $teacher->last_name,
+        'students' => $students
+    ]);
 }
 
 

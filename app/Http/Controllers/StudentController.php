@@ -14,21 +14,24 @@ class StudentController extends Controller
 {
   
     public function index(Request $request)
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user();
+    $perPage = $request->query('per_page', 10); 
 
-        if ($user->role === 'teacher' || $request->is('api/teacher-students*')) {
-            $teacherId = Teacher::where('user_id', $user->id)->value('id');
-            \Log::info("Teacher {$user->email} is fetching their own students (Teacher ID: {$teacherId})");
+    if ($user->role === 'teacher' || $request->is('api/teacher-students*')) {
+        $teacherId = Teacher::where('user_id', $user->id)->value('id');
+        \Log::info("Teacher {$user->email} is fetching their own students (Teacher ID: {$teacherId})");
 
-            return response()->json(
-                Student::where('teacher_id', $teacherId)->with('user')->get()
-            );
-        }
+        $students = Student::where('teacher_id', $teacherId)
+                            ->with('user')
+                            ->paginate($perPage);
 
-        \Log::info("Admin {$user->email} is fetching ALL students");
-        return response()->json(Student::with('teacher', 'user')->get());
+        return response()->json($students);
     }
+
+    \Log::info("Admin {$user->email} is fetching ALL students");
+    return response()->json(Student::with('teacher', 'user')->paginate($perPage));
+}
 
     
     public function store(Request $request)
