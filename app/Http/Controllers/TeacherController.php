@@ -20,10 +20,10 @@ class TeacherController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'first_name'            => 'required|string',
-            'last_name'             => 'required|string',
+            'first_name'            => 'required|string|min:2|max:50',
+            'last_name'             => 'nullable|string|max:50',
             'email'                 => 'required|email|unique:users',
-            'phone_number'          => 'required|string',
+            'phone_number'          => 'required|digits:10',
             'subject_specialization'=> 'required|string',
             'employee_id'           => 'required|string|unique:teachers',
             'date_of_joining'       => 'required|date',
@@ -70,16 +70,16 @@ class TeacherController extends Controller
         $user = User::findOrFail($teacher->user_id);
 
         $validator = Validator::make($request->all(), [
-            'first_name'            => 'sometimes|required|string',
-            'last_name'             => 'sometimes|required|string',
+            'first_name'            => 'sometimes|required|string|min:2|max:50',
+            'last_name'             => 'sometimes|nullable|string|max:50',
             'email'                 => 'sometimes|required|email|unique:users,email,' . $user->id,
-            'phone_number'          => 'sometimes|required|string',
+            'phone_number'          => 'sometimes|required|digits:10',
             'subject_specialization'=> 'sometimes|required|string',
             'employee_id'           => 'sometimes|required|string|unique:teachers,employee_id,' . $teacher->id,
             'date_of_joining'       => 'sometimes|required|date',
             'status'                => 'sometimes|required|in:Active,Inactive',
             'password'              => 'sometimes|min:6'
-        ]);
+        ] );
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -145,10 +145,10 @@ public function updateProfile(Request $request)
     $user = $authUser;
 
     $request->validate([
-        'first_name'   => 'sometimes|required|string',
-        'last_name'    => 'sometimes|required|string',
+        'first_name'   => 'sometimes|required|string|min:2|max:50',
+        'last_name'    => 'sometimes|nullable|string|max:50',
         'email'        => 'sometimes|required|email|unique:users,email,' . $user->id,
-        'phone_number' => 'sometimes|required|string',
+        'phone_number' => 'sometimes|required|digits:10',
         'status'       => 'sometimes|required|in:Active,Inactive',
     ]);
 

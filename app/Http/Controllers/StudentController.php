@@ -39,16 +39,25 @@ class StudentController extends Controller
         $validator = Validator::make($request->all(), [
             'email'         => 'required|email|unique:users',
             'password'      => 'required|min:6',
-            'first_name'    => 'required|string',
-            'last_name'     => 'required|string',
-            'phone_number'  => 'required|string',
+            'first_name'    => 'required|string|min:2|max:50',
+            'last_name'     => 'nullable|string|max:50',
+            'phone_number'  => 'required|digits:10',
             'roll_number'   => 'required|string|unique:students',
             'class_grade'   => 'required|string',
             'date_of_birth' => 'required|date',
             'admission_date'=> 'required|date',
             'status'        => 'required|in:Active,Inactive',
             'teacher_id'    => 'nullable|exists:teachers,id' 
-        ]);
+        ],
+     [
+   
+    'first_name.required' => 'Please enter the student\'s first name.',
+    'first_name.min' => 'First name must be at least 2 characters.',
+    'first_name.max' => 'First name cannot be longer than 50 characters.',
+    'email.unique' => 'This email is already registered.',
+    'roll_number.unique' => 'This roll number is already in use.',
+    'phone_number.digits' => 'Phone number must be exactly 10 digits.',
+]);
 
         if ($validator->fails()) {
             \Log::warning("Validation failed when creating student", $validator->errors()->toArray());
@@ -225,10 +234,10 @@ public function updateProfile(Request $request)
     $user = $authUser;
 
     $request->validate([
-        'first_name'   => 'sometimes|required|string',
-        'last_name'    => 'sometimes|required|string',
+        'first_name'   => 'sometimes|required|string|min:2|max:50',
+        'last_name'    => 'sometimes|nullable|string|max:50',
         'email'        => 'sometimes|required|email|unique:users,email,' . $user->id,
-        'phone_number' => 'sometimes|required|string',
+        'phone_number' => 'sometimes|required|digits:10',
         'status'       => 'sometimes|required|in:Active,Inactive',
     ]);
 

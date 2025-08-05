@@ -16,7 +16,7 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
-        'role',   // ✅ this MUST be here
+        'role',   
     ];
 
     protected $hidden = [
@@ -24,7 +24,7 @@ class User extends Authenticatable implements JWTSubject
         'remember_token',
     ];
 
-    // ✅ JWT methods
+    
     public function getJWTIdentifier()
     {
         return $this->getKey();

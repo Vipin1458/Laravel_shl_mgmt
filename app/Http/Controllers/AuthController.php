@@ -71,9 +71,9 @@ class AuthController extends Controller
 
         if ($request->role === 'teacher') {
             $request->validate([
-                'first_name'            => 'required|string',
-                'last_name'             => 'required|string',
-                'phone_number'          => 'required|string',
+                'first_name'            => 'required|string|min:2|max:50',
+                'last_name'             => 'required|string|max:50',
+                'phone_number'          => 'required|digits:10',
                 'subject_specialization'=> 'required|string',
                 'employee_id'           => 'required|string|unique:teachers',
                 'date_of_joining'       => 'required|date',
@@ -95,9 +95,9 @@ class AuthController extends Controller
 
         if ($request->role === 'student') {
             $request->validate([
-                'first_name'      => 'required|string',
-                'last_name'       => 'required|string',
-                'phone_number'    => 'required|string',
+                'first_name'      => 'required|string|min:2|max:50',
+                'last_name'       => 'nullable|string|max:50',
+                'phone_number'    => 'required|digits:10',
                 'roll_number'     => 'required|string|unique:students',
                 'class'           => 'required|string',
                 'date_of_birth'   => 'required|date',
