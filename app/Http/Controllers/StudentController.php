@@ -138,10 +138,19 @@ class StudentController extends Controller
             unset($request['teacher_id']); 
         }
 
-        $validator = Validator::make($request->all(), [
-            'email'       => 'sometimes|required|email|unique:users,email,' . $user->id,
-            'roll_number' => 'sometimes|required|string|unique:students,roll_number,' . $student->id,
-        ]);
+       $validator = Validator::make($request->all(), [
+    'email'         => 'sometimes|required|email|unique:users,email,' . $user->id,
+    'password'      => 'sometimes|required|min:6',
+    'first_name'    => 'sometimes|required|string|min:2|max:50',
+    'last_name'     => 'sometimes|nullable|string|max:50',
+    'phone_number'  => 'sometimes|required|digits:10',
+    'roll_number'   => 'sometimes|required|string|unique:students,roll_number,' . $student->id,
+    'class_grade'   => 'sometimes|required|string',
+    'date_of_birth' => 'sometimes|required|date',
+    'admission_date'=> 'sometimes|required|date',
+    'status'        => 'sometimes|required|in:Active,Inactive',
+    'teacher_id'    => 'sometimes|nullable|exists:teachers,id',
+]);
 
         if ($validator->fails()) {
             \Log::warning("Validation failed on update", $validator->errors()->toArray());

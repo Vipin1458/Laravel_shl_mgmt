@@ -10,10 +10,9 @@ class RoleMiddleware
     public function handle($request, Closure $next, ...$roles)
     {
         try {
-            $user = JWTAuth::parseToken()->authenticate(); // ✅ Get logged-in user via JWT
-
+            $user = JWTAuth::parseToken()->authenticate(); 
             if (!in_array($user->role, $roles)) {
-                return response()->json(['error' => 'Forbidden – role mismatch'], 403);
+                return response()->json(['error' => 'Forbidden – role mismatch-only admin can do this operation'], 403);
             }
 
             return $next($request);

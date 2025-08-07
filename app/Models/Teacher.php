@@ -10,7 +10,7 @@ class Teacher extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',                // ✅ add this to link with users table
+        'user_id',               
         'first_name',
         'last_name',
         'email',
@@ -21,6 +21,10 @@ class Teacher extends Model
         'status',
     ];
 
+    protected $hidden=[
+         'user_id'
+    ];
+
     public function students()
     {
         return $this->hasMany(Student::class);
@@ -28,6 +32,6 @@ class Teacher extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class); // ✅ relation to user login
+        return $this->belongsTo(User::class); 
     }
 }
