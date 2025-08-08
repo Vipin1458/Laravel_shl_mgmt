@@ -94,6 +94,7 @@ class StudentController extends Controller
             'admission_date'=> $request->admission_date,
             'status'        => $request->status,
         ]);
+        $student->load(['teacher.user']);
 
         return response()->json(['message' => 'Student created successfully', 'student' => $student], 201);
     }
@@ -225,9 +226,22 @@ public function myProfile()
         return response()->json(['error' => 'Only students can access this'], 403);
     }
 
-    $student = Student::with('user')->where('user_id', $authUser->id)->firstOrFail();
+       $student = Student::with(['user', 'teacher.user:id,name'])
+        ->where('user_id', $authUser->id)
+        ->firstOrFail();
 
-    return response()->json($student);
+    return response()->json([
+        'id'            => $student->id,
+        'first_name'    => $student->first_name,
+        'last_name'     => $student->last_name,
+        'email'         => $student->email,
+        'phone_number'  => $student->phone_number,
+        'class_grade'   => $student->class_grade,
+        'date_of_birth' => $student->date_of_birth,
+        'admission_date' => $student->admission_date,
+        'status'        => $student->status,
+        'teacher_name'  => $student->teacher?->user?->name, 
+    ]);
 }
 
 
@@ -258,7 +272,7 @@ public function updateProfile(Request $request)
     $user->save();
 
     $student->update($request->only(['first_name', 'last_name', 'phone_number', 'email', 'status']));
-
+    
     return response()->json(['message' => 'Student profile updated successfully', 'student' => $student]);
 }
 

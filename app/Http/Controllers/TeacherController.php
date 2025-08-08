@@ -11,12 +11,14 @@ use Illuminate\Support\Facades\Validator;
 class TeacherController extends Controller
 {
 
-    public function index()
-    {
-        return response()->json(Teacher::with('user')->get());
-    }
+  public function index(Request $request)
+{
+    $perPage = $request->query('per_page', 10); 
+    $teachers = Teacher::with('user')->paginate($perPage);
 
-    
+    return response()->json($teachers);
+}
+   
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
