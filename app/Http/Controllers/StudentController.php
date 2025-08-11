@@ -235,6 +235,7 @@ public function myProfile()
         'first_name'    => $student->first_name,
         'last_name'     => $student->last_name,
         'email'         => $student->email,
+        'roll_number'   => $student->roll_number,
         'phone_number'  => $student->phone_number,
         'class_grade'   => $student->class_grade,
         'date_of_birth' => $student->date_of_birth,
